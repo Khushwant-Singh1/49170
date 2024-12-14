@@ -52,17 +52,21 @@ def get_conversation_chain(vectorstore):
 
 
 def handle_userinput(user_question):
-    response = st.session_state.conversation({'question': user_question})
-    st.session_state.chat_history = response['chat_history']
+    # Check if conversation is initialized before trying to use it
+    if st.session_state.conversation is not None:
+        response = st.session_state.conversation({'question': user_question})
+        st.session_state.chat_history = response['chat_history']
 
-    for i, message in enumerate(st.session_state.chat_history):
-        if i % 2 == 0:
-            st.write(user_template.replace(
-                "{{MSG}}", message.content), unsafe_allow_html=True)
-        else:
-            st.write(bot_template.replace(
-                "{{MSG}}", message.content), unsafe_allow_html=True)
-
+        for i, message in enumerate(st.session_state.chat_history):
+            if i % 2 == 0:
+                st.write(user_template.replace(
+                    "{{MSG}}", message.content), unsafe_allow_html=True)
+            else:
+                st.write(bot_template.replace(
+                    "{{MSG}}", message.content), unsafe_allow_html=True)
+    else:
+        # Provide a user-friendly message if no PDFs have been processed
+        st.warning("Please upload and process PDFs first before asking questions.")
 
 def main():
     st.set_page_config(page_title="Chat with multiple PDFs",
